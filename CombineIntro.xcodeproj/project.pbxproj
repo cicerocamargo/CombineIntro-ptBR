@@ -16,6 +16,7 @@
 		61120383264554E300311AE0 /* BalanceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61120382264554E300311AE0 /* BalanceService.swift */; };
 		611203852645558600311AE0 /* UIViewController+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 611203842645558600311AE0 /* UIViewController+Extensions.swift */; };
 		611400F5267E788300D64163 /* PublisherButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 611400F4267E788300D64163 /* PublisherButton.swift */; };
+		611400F7267E849500D64163 /* BalanceViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 611400F6267E849500D64163 /* BalanceViewModel.swift */; };
 		61372F98264941F20079A228 /* BalanceViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61372F97264941F20079A228 /* BalanceViewState.swift */; };
 		61E0BE8E264BDED500414040 /* CombineIntroTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61E0BE8D264BDED500414040 /* CombineIntroTests.swift */; };
 /* End PBXBuildFile section */
@@ -42,6 +43,7 @@
 		61120382264554E300311AE0 /* BalanceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BalanceService.swift; sourceTree = "<group>"; };
 		611203842645558600311AE0 /* UIViewController+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIViewController+Extensions.swift"; sourceTree = "<group>"; };
 		611400F4267E788300D64163 /* PublisherButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublisherButton.swift; sourceTree = "<group>"; };
+		611400F6267E849500D64163 /* BalanceViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BalanceViewModel.swift; sourceTree = "<group>"; };
 		61372F97264941F20079A228 /* BalanceViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BalanceViewState.swift; sourceTree = "<group>"; };
 		61E0BE8B264BDED500414040 /* CombineIntroTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CombineIntroTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		61E0BE8D264BDED500414040 /* CombineIntroTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombineIntroTests.swift; sourceTree = "<group>"; };
@@ -106,6 +108,7 @@
 				611203802645549F00311AE0 /* BalanceViewController.swift */,
 				61120382264554E300311AE0 /* BalanceService.swift */,
 				61372F97264941F20079A228 /* BalanceViewState.swift */,
+				611400F6267E849500D64163 /* BalanceViewModel.swift */,
 			);
 			path = BalanceFeature;
 			sourceTree = "<group>";
@@ -241,6 +244,7 @@
 				611203812645549F00311AE0 /* BalanceViewController.swift in Sources */,
 				611203852645558600311AE0 /* UIViewController+Extensions.swift in Sources */,
 				61372F98264941F20079A228 /* BalanceViewState.swift in Sources */,
+				611400F7267E849500D64163 /* BalanceViewModel.swift in Sources */,
 				611203692645517F00311AE0 /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

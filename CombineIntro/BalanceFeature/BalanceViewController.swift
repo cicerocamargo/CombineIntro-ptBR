@@ -5,10 +5,8 @@ import UIKit
 @dynamicMemberLookup
 class BalanceViewController: UIViewController {
     private let rootView = BalanceView()
-    private let service: BalanceService
-    private var state = BalanceViewState() {
-        didSet { updateView() }
-    }
+    private let viewModel: BalanceViewModel
+    private var state: BalanceViewState { viewModel.state }
     private let formatDate: (Date) -> String
     private var cancellables = Set<AnyCancellable>()
 
@@ -16,7 +14,7 @@ class BalanceViewController: UIViewController {
         service: BalanceService,
         formatDate: @escaping (Date) -> String = BalanceViewState.relativeDateFormatter.string(from:)
     ) {
-        self.service = service
+        self.viewModel = .init(service: service)
         self.formatDate = formatDate
         super.init(nibName: nil, bundle: nil)
     }
@@ -32,41 +30,18 @@ class BalanceViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        viewModel.statePublisher
+            .sink { [weak self] _ in self?.updateView() }
+            .store(in: &cancellables)
+
         rootView.refreshButton.touchUpInsidePublisher
-            .sink { [weak self] _ in self?.refreshBalance() }
-            .store(in: &cancellables)
-
-        NotificationCenter.default
-            .publisher(for: UIApplication.willResignActiveNotification)
-            .sink { [weak self] _ in self?.state.isRedacted = true }
-            .store(in: &cancellables)
-
-        NotificationCenter.default
-            .publisher(for: UIApplication.didBecomeActiveNotification)
-            .sink { [weak self] _ in self?.state.isRedacted = false }
+            .sink(receiveValue: viewModel.refreshBalance)
             .store(in: &cancellables)
     }
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        refreshBalance()
-    }
-
-    @objc private func refreshBalance() {
-        state.didFail = false
-        state.isRefreshing = true
-        service.refreshBalance { [weak self] result in
-            self?.handleResult(result)
-        }
-    }
-
-    private func handleResult(_ result: Result<BalanceResponse, Error>) {
-        state.isRefreshing = false
-        do {
-            state.lastResponse = try result.get()
-        } catch {
-            state.didFail = true
-        }
+        viewModel.refreshBalance()
     }
 
     private func updateView() {
