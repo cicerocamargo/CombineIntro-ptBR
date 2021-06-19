@@ -10,10 +10,7 @@ class BalanceViewController: UIViewController {
         didSet { updateView() }
     }
     private let formatDate: (Date) -> String
-
-    private var buttonCancellable: AnyCancellable?
-    private var willResignActiveNotificationCancellable: AnyCancellable?
-    private var didBecomeActiveNotificationCancellable: AnyCancellable?
+    private var cancellables = Set<AnyCancellable>()
 
     init(
         service: BalanceService,
@@ -35,22 +32,19 @@ class BalanceViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        buttonCancellable = rootView.refreshButton.touchUpInsidePublisher
-            .sink { [weak self] _ in
-                self?.refreshBalance()
-            }
+        rootView.refreshButton.touchUpInsidePublisher
+            .sink { [weak self] _ in self?.refreshBalance() }
+            .store(in: &cancellables)
 
-        willResignActiveNotificationCancellable = NotificationCenter.default
+        NotificationCenter.default
             .publisher(for: UIApplication.willResignActiveNotification)
-            .sink { [weak self] _ in
-                self?.state.isRedacted = true
-            }
+            .sink { [weak self] _ in self?.state.isRedacted = true }
+            .store(in: &cancellables)
 
-        didBecomeActiveNotificationCancellable = NotificationCenter.default
+        NotificationCenter.default
             .publisher(for: UIApplication.didBecomeActiveNotification)
-            .sink { [weak self] _ in
-                self?.state.isRedacted = false
-            }
+            .sink { [weak self] _ in self?.state.isRedacted = false }
+            .store(in: &cancellables)
     }
 
     override func viewDidAppear(_ animated: Bool) {
