@@ -3,17 +3,8 @@ import Foundation
 import UIKit
 
 final class BalanceViewModel {
-    private let stateSubject = CurrentValueSubject<BalanceViewState, Never>(.init())
-    
-    var statePublisher: AnyPublisher<BalanceViewState, Never> {
-        stateSubject.eraseToAnyPublisher()
-    }
-
-    private(set) var state: BalanceViewState {
-        get { stateSubject.value }
-        set { stateSubject.send(newValue) }
-    }
-
+    @Published
+    private(set) var state = BalanceViewState()
     private var cancellables = Set<AnyCancellable>()
     private let service: BalanceService
 

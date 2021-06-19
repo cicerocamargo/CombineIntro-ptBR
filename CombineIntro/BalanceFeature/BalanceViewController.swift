@@ -6,7 +6,6 @@ import UIKit
 class BalanceViewController: UIViewController {
     private let rootView = BalanceView()
     private let viewModel: BalanceViewModel
-    private var state: BalanceViewState { viewModel.state }
     private let formatDate: (Date) -> String
     private var cancellables = Set<AnyCancellable>()
 
@@ -30,8 +29,8 @@ class BalanceViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        viewModel.statePublisher
-            .sink { [weak self] _ in self?.updateView() }
+        viewModel.$state
+            .sink { [weak self] in self?.updateView(state: $0) }
             .store(in: &cancellables)
 
         rootView.refreshButton.touchUpInsidePublisher
@@ -44,7 +43,7 @@ class BalanceViewController: UIViewController {
         viewModel.refreshBalance()
     }
 
-    private func updateView() {
+    private func updateView(state: BalanceViewState) {
         rootView.refreshButton.isHidden = state.isRefreshing
         if state.isRefreshing {
             rootView.activityIndicator.startAnimating()
