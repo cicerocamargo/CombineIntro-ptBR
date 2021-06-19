@@ -1,3 +1,4 @@
+import Combine
 import Foundation
 import UIKit
 
@@ -10,6 +11,7 @@ class BalanceViewController: UIViewController {
     }
     private var notificationCenterTokens: [NSObjectProtocol] = []
     private let formatDate: (Date) -> String
+    private var buttonCancellable: AnyCancellable?
 
     init(
         service: BalanceService,
@@ -31,18 +33,17 @@ class BalanceViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        rootView.refreshButton.addTarget(
-            self,
-            action: #selector(refreshBalance),
-            for: .touchUpInside
-        )
+        buttonCancellable = rootView.refreshButton.touchUpInsidePublisher
+            .sink(receiveValue: { [weak self] _ in
+                self?.refreshBalance()
+            })
 
         notificationCenterTokens.append(
             NotificationCenter.default.addObserver(
                 forName: UIApplication.willResignActiveNotification,
                 object: nil,
                 queue: .main
-            ) { [weak self ]_ in
+            ) { [weak self] _ in
                 self?.state.isRedacted = true
             }
         )
@@ -52,7 +53,7 @@ class BalanceViewController: UIViewController {
                 forName: UIApplication.didBecomeActiveNotification,
                 object: nil,
                 queue: .main
-            ) { [weak self ]_ in
+            ) { [weak self] _ in
                 self?.state.isRedacted = false
             }
         )
