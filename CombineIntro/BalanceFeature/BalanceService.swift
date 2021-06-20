@@ -1,3 +1,4 @@
+import Combine
 import Foundation
 
 struct BalanceResponse {
@@ -9,6 +10,15 @@ protocol BalanceService {
     func refreshBalance(
         completion: @escaping (Result<BalanceResponse, Error>) -> Void
     )
+}
+
+extension BalanceService {
+    func refreshBalance() -> AnyPublisher<BalanceResponse, Error> {
+        Future { promise in
+            self.refreshBalance(completion: promise)
+        }
+        .eraseToAnyPublisher()
+    }
 }
 
 #if DEBUG

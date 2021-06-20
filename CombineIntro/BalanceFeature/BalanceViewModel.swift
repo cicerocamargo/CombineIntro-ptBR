@@ -42,17 +42,18 @@ final class BalanceViewModel {
     private func refreshBalance() {
         state.didFail = false
         state.isRefreshing = true
-        service.refreshBalance { [weak self] result in
-            self?.handleResult(result)
-        }
-    }
-
-    private func handleResult(_ result: Result<BalanceResponse, Error>) {
-        state.isRefreshing = false
-        do {
-            state.lastResponse = try result.get()
-        } catch {
-            state.didFail = true
-        }
+        service.refreshBalance()
+            .sink(
+                receiveCompletion: { [weak self] completion in
+                    self?.state.isRefreshing = false
+                    if case .failure = completion {
+                        self?.state.didFail = true
+                    }
+                },
+                receiveValue: { [weak self] response in
+                    self?.state.lastResponse = response
+                }
+            )
+            .store(in: &cancellables)
     }
 }
