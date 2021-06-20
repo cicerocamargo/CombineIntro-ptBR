@@ -29,6 +29,25 @@ class BalanceViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        let isRefreshing = viewModel.$state
+            .map(\.isRefreshing)
+            .removeDuplicates()
+
+        isRefreshing
+            .assign(to: \.rootView.refreshButton.isHidden, on: self)
+            .store(in: &cancellables)
+
+        isRefreshing
+            .assign(to: \.writableIsAnimating, on: rootView.activityIndicator)
+            .store(in: &cancellables)
+
+        viewModel.$state
+            .map(\.formattedBalance)
+            .map(Optional.init)
+            .removeDuplicates()
+            .assign(to: \.text, on: rootView.valueLabel)
+            .store(in: &cancellables)
+
         viewModel.$state
             .sink { [weak self] in self?.updateView(state: $0) }
             .store(in: &cancellables)
@@ -45,21 +64,36 @@ class BalanceViewController: UIViewController {
     }
 
     private func updateView(state: BalanceViewState) {
-        rootView.refreshButton.isHidden = state.isRefreshing
-        if state.isRefreshing {
-            rootView.activityIndicator.startAnimating()
-        } else {
-            rootView.activityIndicator.stopAnimating()
-        }
-        rootView.valueLabel.text = state.formattedBalance
         rootView.valueLabel.alpha = state.isRedacted
             ? BalanceView.alphaForRedactedValueLabel
             : 1
         rootView.infoLabel.text = state.infoText(formatDate: formatDate)
         rootView.infoLabel.textColor = state.infoColor
         rootView.redactedOverlay.isHidden = !state.isRedacted
+    }
+}
 
-        view.setNeedsLayout()
+extension UIActivityIndicatorView {
+    var writableIsAnimating: Bool {
+        get { isAnimating }
+        set {
+            if newValue {
+                startAnimating()
+            } else {
+                stopAnimating()
+            }
+        }
+    }
+}
+
+extension Publisher where Failure == Never {
+    func assign<Root: AnyObject>(
+        to keyPath: ReferenceWritableKeyPath<Root, Output>,
+        onWeak object: Root
+    ) -> AnyCancellable {
+        sink { [weak object] value in
+            object?[keyPath: keyPath] = value
+        }
     }
 }
 
